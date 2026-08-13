@@ -1331,17 +1331,14 @@ if st.session_state.simulation_run:
     )
 
 
-
-
-# ------------------------------------------------------------
+# ============================================================
 # PAYOUT CONCENTRATION BY DEPARTMENT
-# ------------------------------------------------------------
+# ============================================================
 
 st.markdown("### Variable Pay Concentration by Department")
 
 department_payout = (
-    simulation
-    .groupby("Department")["Final_Variable_Pay"]
+    simulation.groupby("Department")["Final_Variable_Pay"]
     .sum()
     .reset_index()
     .sort_values(
@@ -1364,6 +1361,8 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
+
+
 # ============================================================
 # BUDGET OPTIMIZATION & POLICY RECOMMENDATION
 # ============================================================
