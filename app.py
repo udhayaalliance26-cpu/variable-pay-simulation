@@ -2105,8 +2105,12 @@ if st.session_state.simulation_run:
     st.divider()
 
     st.subheader("Management Report")
-
-    report_text = f"""
+overall_budget_status = (
+    "WITHIN BUDGET"
+    if selected_budget >= baseline_payout
+    else "OVER BUDGET"
+)
+report_text = f"""
 VARIABLE PAY MANAGEMENT REPORT
 ================================
 
