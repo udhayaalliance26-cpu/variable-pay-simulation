@@ -2203,7 +2203,7 @@ Budget Utilization: {recommended_policy["Budget Utilization (%)"]:.1f}%
 
 GOVERNANCE STATUS
 
-Overall Budget Status: {"WITHIN BUDGET" if selected_budget >= baseline_payout else "OVER BUDGET"}
+Overall Budget Status: {"WITHIN BUDGET" if baseline_budget_gap >= 0 else "OVER BUDGET"}
 
 BASELINE PAYOUT
 
