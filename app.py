@@ -1,7 +1,15 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+# ============================================================
+# SESSION STATE
+# ============================================================
 
+if "simulation" not in st.session_state:
+    st.session_state.simulation = None
+
+if "simulation_run" not in st.session_state:
+    st.session_state.simulation_run = False
 
 # ============================================================
 # PAGE CONFIGURATION
