@@ -2097,7 +2097,8 @@ scenarios rather than being treated as a fixed or universal compensation
 rule.
 """)
 # ============================================================
-# EXPORTABLE MANAGEMENT REPORT + PDF DOWNLOAD
+# EXPORTABLE MANAGEMENT REPORT
+# PDF + EXCEL DOWNLOAD
 # ============================================================
 
 if st.session_state.simulation_run:
@@ -2199,9 +2200,9 @@ combinations of target variable pay, minimum performance
 threshold, and maximum payout against the approved
 variable-pay budget.
 
-The optimization process is intended to identify a policy
-setting that provides an appropriate variable-pay structure
-while maintaining budget discipline.
+The optimization process identifies a policy configuration
+that maintains budget discipline while supporting the
+variable-pay objectives of the simulated workforce.
 
 POLICY INTERPRETATION
 ----------------------------------------
@@ -2211,9 +2212,9 @@ variable-pay payouts. Higher performance can result in
 higher payouts subject to the defined threshold and
 maximum-payout rules.
 
-The recommended policy represents the best-performing
-policy configuration identified within the tested
-simulation alternatives and budget constraints.
+The recommended policy represents the policy configuration
+identified through the tested simulation alternatives and
+budget constraints.
 
 DATA DISCLAIMER
 ----------------------------------------
@@ -2237,7 +2238,7 @@ compensation recommendation for a real organization.
         st.text(report_text)
 
     # ========================================================
-    # PDF MANAGEMENT REPORT DOWNLOAD
+    # PDF MANAGEMENT REPORT
     # ========================================================
 
     from io import BytesIO
@@ -2266,10 +2267,7 @@ compensation recommendation for a real organization.
 
     story = []
 
-    # --------------------------------------------------------
     # PDF TITLE
-    # --------------------------------------------------------
-
     story.append(
         Paragraph(
             "VARIABLE PAY MANAGEMENT REPORT",
@@ -2281,10 +2279,7 @@ compensation recommendation for a real organization.
         Spacer(1, 15)
     )
 
-    # --------------------------------------------------------
-    # CONVERT MANAGEMENT REPORT INTO PDF
-    # --------------------------------------------------------
-
+    # CONVERT REPORT TEXT INTO PDF
     for line in report_text.split("\n"):
 
         clean_line = line.strip()
@@ -2318,153 +2313,143 @@ compensation recommendation for a real organization.
                 Spacer(1, 4)
             )
 
-    # --------------------------------------------------------
-    # BUILD PDF
-    # --------------------------------------------------------
-
     pdf_doc.build(story)
 
     pdf_buffer.seek(0)
 
     # --------------------------------------------------------
-    # DOWNLOAD BUTTON
+    # EXCEL MANAGEMENT REPORT
     # --------------------------------------------------------
 
-    st.download_button(
-        label="📄 Download Management Report (PDF)",
-        data=pdf_buffer,
-        file_name="Variable_Pay_Management_Report.pdf",
-        mime="application/pdf"
-    )
-    st.download_button(
-    label="📄 Download Management Report (PDF)",
-    data=pdf_buffer,
-    file_name="Variable_Pay_Management_Report.pdf",
-    mime="application/pdf"
-)
-    # ============================================================
-# EXCEL MANAGEMENT REPORT DOWNLOAD
-# ============================================================
+    excel_buffer = BytesIO()
 
-excel_buffer = BytesIO()
+    with pd.ExcelWriter(
+        excel_buffer,
+        engine="openpyxl"
+    ) as writer:
 
-with pd.ExcelWriter(
-    excel_buffer,
-    engine="openpyxl"
-) as writer:
+        # --------------------------------------------
+        # SUMMARY SHEET
+        # --------------------------------------------
 
-    # --------------------------------------------------------
-    # SHEET 1 — MANAGEMENT SUMMARY
-    # --------------------------------------------------------
+        summary_df = pd.DataFrame({
+            "Metric": [
+                "Workforce Size",
+                "Data Type",
+                "Approved Variable Pay Budget",
+                "Current Projected Variable Pay",
+                "Current Budget Utilization (%)",
+                "Current Budget Gap",
+                "Current Budget Status",
+                "Recommended Target Variable Pay (%)",
+                "Recommended Minimum Performance Threshold",
+                "Recommended Maximum Payout (%)",
+                "Recommended Projected Variable Pay",
+                "Recommended Budget Utilization (%)",
+                "Recommended Budget Status"
+            ],
 
-    management_summary = pd.DataFrame({
-        "Metric": [
-            "Workforce Size",
-            "Data Type",
-            "Approved Variable Pay Budget",
-            "Current Projected Variable Pay",
-            "Current Budget Utilization (%)",
-            "Current Budget Gap",
-            "Current Budget Status",
-            "Recommended Target Variable Pay (%)",
-            "Recommended Minimum Performance Threshold",
-            "Recommended Maximum Payout (%)",
-            "Recommended Projected Variable Pay",
-            "Recommended Budget Utilization (%)",
-            "Recommended Budget Status"
-        ],
+            "Value": [
+                500,
+                "Synthetic / Academic Simulation",
+                selected_budget,
+                report_baseline_payout,
+                report_budget_utilization,
+                report_budget_gap,
+                report_budget_status,
+                recommended_policy["Target Variable Pay (%)"],
+                recommended_policy["Minimum Performance Threshold"],
+                recommended_policy["Maximum Payout (%)"],
+                recommended_policy["Projected Variable Pay"],
+                recommended_budget_utilization,
+                recommended_budget_status
+            ]
+        })
 
-        "Value": [
-            500,
-            "Synthetic / Academic Simulation",
-            selected_budget,
-            report_baseline_payout,
-            report_budget_utilization,
-            report_budget_gap,
-            report_budget_status,
-            recommended_policy["Target Variable Pay (%)"],
-            recommended_policy["Minimum Performance Threshold"],
-            recommended_policy["Maximum Payout (%)"],
-            recommended_policy["Projected Variable Pay"],
-            recommended_policy["Budget Utilization (%)"],
-            recommended_budget_status
-        ]
-    })
+        summary_df.to_excel(
+            writer,
+            sheet_name="Management Summary",
+            index=False
+        )
 
-    management_summary.to_excel(
-        writer,
-        sheet_name="Management Summary",
-        index=False
-    )
+        # --------------------------------------------
+        # RECOMMENDED POLICY SHEET
+        # --------------------------------------------
 
-    # --------------------------------------------------------
-    # SHEET 2 — POLICY ALTERNATIVES
-    # --------------------------------------------------------
+        policy_df = pd.DataFrame({
+            "Policy Metric": [
+                "Target Variable Pay (%)",
+                "Minimum Performance Threshold",
+                "Maximum Payout (%)",
+                "Projected Variable Pay",
+                "Budget Utilization (%)",
+                "Budget Status"
+            ],
 
-    policy_alternatives.to_excel(
-        writer,
-        sheet_name="Policy Alternatives",
-        index=False
-    )
+            "Recommended Value": [
+                recommended_policy["Target Variable Pay (%)"],
+                recommended_policy["Minimum Performance Threshold"],
+                recommended_policy["Maximum Payout (%)"],
+                recommended_policy["Projected Variable Pay"],
+                recommended_policy["Budget Utilization (%)"],
+                recommended_budget_status
+            ]
+        })
 
-    # --------------------------------------------------------
-    # SHEET 3 — EMPLOYEE SIMULATION
-    # --------------------------------------------------------
+        policy_df.to_excel(
+            writer,
+            sheet_name="Recommended Policy",
+            index=False
+        )
 
-    st.session_state.simulation.to_excel(
-        writer,
-        sheet_name="Employee Simulation",
-        index=False
-    )
+        # --------------------------------------------
+        # POLICY ALTERNATIVES SHEET
+        # --------------------------------------------
 
-    # --------------------------------------------------------
-    # BASIC EXCEL FORMATTING
-    # --------------------------------------------------------
+        if "policy_results" in locals():
 
-    workbook = writer.book
-
-    for worksheet in workbook.worksheets:
-
-        # Bold header row
-        for cell in worksheet[1]:
-            cell.font = openpyxl.styles.Font(
-                bold=True
+            policy_results.to_excel(
+                writer,
+                sheet_name="Policy Alternatives",
+                index=False
             )
 
-        # Adjust column widths
-        for column_cells in worksheet.columns:
+        # --------------------------------------------
+        # SIMULATION DATA SHEET
+        # --------------------------------------------
 
-            max_length = 0
-            column_letter = column_cells[0].column_letter
+        st.session_state.simulation.to_excel(
+            writer,
+            sheet_name="Simulation Data",
+            index=False
+        )
 
-            for cell in column_cells:
+    excel_buffer.seek(0)
 
-                if cell.value is not None:
+    # ========================================================
+    # DOWNLOAD BUTTONS
+    # ========================================================
 
-                    max_length = max(
-                        max_length,
-                        len(str(cell.value))
-                    )
+    st.markdown("### Download Management Report")
 
-            worksheet.column_dimensions[
-                column_letter
-            ].width = min(
-                max_length + 2,
-                40
-            )
+    col1, col2 = st.columns(2)
 
-        # Freeze header row
-        worksheet.freeze_panes = "A2"
+    with col1:
 
-excel_buffer.seek(0)
+        st.download_button(
+            label="📄 Download PDF Report",
+            data=pdf_buffer,
+            file_name="Variable_Pay_Management_Report.pdf",
+            mime="application/pdf",
+            use_container_width=True
+        )
 
-# ------------------------------------------------------------
-# EXCEL DOWNLOAD BUTTON
-# ------------------------------------------------------------
+    with col2:
 
-st.download_button(
-    label="📊 Download Management Report (Excel)",
-    data=excel_buffer,
-    file_name="Variable_Pay_Management_Report.xlsx",
-    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-)
+        st.download_button(
+            label="📊 Download Excel Report",
+            data=excel_buffer,
+            file_name="Variable_Pay_Management_Report.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            use_container_width=True
+        )
