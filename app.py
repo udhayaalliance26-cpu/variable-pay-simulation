@@ -517,7 +517,7 @@ with col1:
         "Company Performance (%)",
         min_value=0,
         max_value=100,
-        value=50
+        value=50,
         step=1
     )
 
@@ -528,7 +528,7 @@ with col2:
         "Target Variable Pay (%)",
         min_value=5,
         max_value=25,
-        value=5
+        value=5,
         step=1
     )
 
@@ -564,7 +564,7 @@ with col5:
         min_value=50,
         max_value=150,
         value=10,
-        step=5
+        step=5,
     ) / 100
 
 
