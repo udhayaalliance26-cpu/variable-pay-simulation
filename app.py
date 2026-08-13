@@ -1632,7 +1632,24 @@ with rec_col6:
 # ------------------------------------------------------------
 # BASELINE VS RECOMMENDED
 # ------------------------------------------------------------
+# ============================================================
+# BASELINE PAYOUT
+# ============================================================
 
+baseline_payout = actual_variable_pay
+
+baseline_budget_gap = (
+    selected_budget - baseline_payout
+)
+
+baseline_reduction_required = (
+    max(
+        0,
+        (baseline_payout - selected_budget)
+        / baseline_payout
+        * 100
+    )
+)
 st.markdown("### Baseline vs Recommended Policy")
 
 comparison_df = pd.DataFrame({
