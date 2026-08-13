@@ -2105,6 +2105,8 @@ if st.session_state.simulation_run:
     st.divider()
 
     st.subheader("Management Report")
+baseline_payout = st.session_state.simulation["Final_Variable_Pay"].sum()
+
 overall_budget_status = (
     "WITHIN BUDGET"
     if selected_budget >= baseline_payout
