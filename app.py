@@ -1331,37 +1331,36 @@ if st.session_state.simulation_run:
     )
 
 
-# ============================================================
-# PAYOUT CONCENTRATION BY DEPARTMENT
-# ============================================================
+    # ============================================================
+    # PAYOUT CONCENTRATION BY DEPARTMENT
+    # ============================================================
 
-st.markdown("### Variable Pay Concentration by Department")
+    st.markdown("### Variable Pay Concentration by Department")
 
-department_payout = (
-    simulation.groupby("Department")["Final_Variable_Pay"]
-    .sum()
-    .reset_index()
-    .sort_values(
-        "Final_Variable_Pay",
-        ascending=False
+    department_payout = (
+        simulation.groupby("Department")["Final_Variable_Pay"]
+        .sum()
+        .reset_index()
+        .sort_values(
+            "Final_Variable_Pay",
+            ascending=False
+        )
     )
-)
 
-department_payout["Payout Share (%)"] = (
-    department_payout["Final_Variable_Pay"]
-    / actual_variable_pay
-    * 100
-)
+    department_payout["Payout Share (%)"] = (
+        department_payout["Final_Variable_Pay"]
+        / actual_variable_pay
+        * 100
+    )
 
-st.dataframe(
-    department_payout.style.format({
-        "Final_Variable_Pay": "₹{:,.0f}",
-        "Payout Share (%)": "{:.1f}%"
-    }),
-    use_container_width=True,
-    hide_index=True
-)
-
+    st.dataframe(
+        department_payout.style.format({
+            "Final_Variable_Pay": "₹{:,.0f}",
+            "Payout Share (%)": "{:.1f}%"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
 
 # ============================================================
 # BUDGET OPTIMIZATION & POLICY RECOMMENDATION
