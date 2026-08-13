@@ -515,7 +515,7 @@ with col1:
 
     company_performance = st.slider(
         "Company Performance (%)",
-        min_value=0
+        min_value=0,
         max_value=100,
         value=50
         step=1
