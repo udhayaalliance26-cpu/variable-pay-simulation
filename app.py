@@ -525,6 +525,13 @@ if run_simulation:
     st.session_state.simulation_run = True
 
 
+if st.session_state.simulation_run:
+
+    simulation = st.session_state.simulation
+
+    
+
+
     # ========================================================
     # KEY METRICS
     # ========================================================
