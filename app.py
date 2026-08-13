@@ -512,7 +512,7 @@ run_simulation = st.button(
 )
 
 
-if run_simulation:
+if st.session_state.simulation_run:
 
     simulation = generate_final_simulation(
         company_performance=company_performance,
@@ -521,6 +521,8 @@ if run_simulation:
         selected_threshold=selected_threshold,
         selected_max_payout=selected_max_payout
     )
+    st.session_state.simulation = simulation
+    st.session_state.simulation_run = True
 
 
     # ========================================================
@@ -1092,4 +1094,3 @@ Base Salary
         """,
         language="text"
     )
-    
