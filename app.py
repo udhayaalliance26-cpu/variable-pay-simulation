@@ -1383,7 +1383,7 @@ st.markdown(
 # ------------------------------------------------------------
 
 baseline_payout = (
-    simulation["Final_Variable_Pay"].sum()
+    st.session_state.simulation["Final_Variable_Pay"].sum()
 )
 
 baseline_budget_gap = (
