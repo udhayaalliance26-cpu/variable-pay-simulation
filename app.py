@@ -1230,13 +1230,13 @@ if st.session_state.simulation_run:
 # GOVERNANCE STATUS
 # ------------------------------------------------------------
 
-if budget_surplus_deficit >= 0:
+    if budget_surplus_deficit >= 0:
 
-    overall_budget_status = "WITHIN APPROVED BUDGET"
+        overall_budget_status = "WITHIN APPROVED BUDGET"
 
-else:
+    else:
 
-    overall_budget_status = "BUDGET EXCEEDED"
+        overall_budget_status = "BUDGET EXCEEDED"
 
 
 # ------------------------------------------------------------
@@ -1295,18 +1295,18 @@ with budget_col6:
 # OVERALL STATUS
 # ------------------------------------------------------------
 
-if overall_budget_status == "WITHIN APPROVED BUDGET":
+    if overall_budget_status == "WITHIN APPROVED BUDGET":
 
-    st.success(
-        f"✓ {overall_budget_status}"
-    )
+        st.success(
+            f"✓ {overall_budget_status}"
+        )
 
-else:
+    else:
 
-    st.error(
-        f"⚠ {overall_budget_status}"
-    )
-
+        st.error(
+            f"⚠ {overall_budget_status}"
+        )
+   
 
 # ------------------------------------------------------------
 # GOVERNANCE DISTRIBUTION
