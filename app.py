@@ -20,7 +20,76 @@ st.set_page_config(
     page_icon="💼",
     layout="wide"
 )
+# ============================================================
+# PROFESSIONAL APPLICATION STYLING
+# ============================================================
 
+st.markdown(
+    """
+    <style>
+
+    /* Main application spacing */
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 3rem;
+        padding-left: 4rem;
+        padding-right: 4rem;
+    }
+
+    /* Main headings */
+    h1 {
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    h2 {
+        font-weight: 650;
+        margin-top: 2rem;
+    }
+
+    h3 {
+        font-weight: 600;
+    }
+
+    /* Metric cards */
+    [data-testid="stMetric"] {
+        background-color: rgba(255, 255, 255, 0.035);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 18px;
+    }
+
+    [data-testid="stMetricLabel"] {
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    [data-testid="stMetricValue"] {
+        font-weight: 650;
+    }
+
+    /* Buttons */
+    .stButton > button {
+        border-radius: 7px;
+        font-weight: 600;
+        padding: 0.55rem 1.2rem;
+    }
+
+    /* Tables */
+    [data-testid="stDataFrame"] {
+        border-radius: 8px;
+    }
+
+    /* Divider */
+    hr {
+        margin-top: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # ============================================================
 # MODEL SETUP
