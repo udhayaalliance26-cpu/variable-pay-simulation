@@ -1289,3 +1289,347 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
+# ============================================================
+# BUDGET OPTIMIZATION & POLICY RECOMMENDATION
+# ============================================================
+
+st.divider()
+
+st.subheader("Budget Optimization & Policy Recommendation")
+
+st.markdown(
+    """
+    This analysis evaluates alternative compensation-policy settings
+    against the approved variable-pay budget. The current simulation
+    remains unchanged; these are alternative policy tests.
+    """
+)
+
+# ------------------------------------------------------------
+# BASELINE
+# ------------------------------------------------------------
+
+baseline_payout = (
+    simulation["Final_Variable_Pay"].sum()
+)
+
+baseline_budget_gap = (
+    selected_budget - baseline_payout
+)
+
+baseline_reduction_required = (
+    max(
+        0,
+        (baseline_payout - selected_budget)
+        / baseline_payout
+        * 100
+    )
+)
+
+# ------------------------------------------------------------
+# DEFINE POLICY OPTIONS
+# ------------------------------------------------------------
+
+target_options = sorted(
+    set(
+        max(
+            0.05,
+            (target_variable_pay - reduction) / 100
+        )
+        for reduction in [0, 1, 2, 3, 4]
+    )
+)
+
+threshold_options = sorted(
+    set(
+        [
+            selected_threshold,
+            min(80, selected_threshold + 10),
+            min(80, selected_threshold + 20)
+        ]
+    )
+)
+
+maximum_payout_options = sorted(
+    set(
+        [
+            selected_max_payout,
+            max(0.50, selected_max_payout - 0.25),
+            max(0.50, selected_max_payout - 0.50)
+        ]
+    )
+)
+
+# ------------------------------------------------------------
+# TEST ALTERNATIVE POLICIES
+# ------------------------------------------------------------
+
+optimization_results = []
+
+for target_option in target_options:
+
+    for threshold_option in threshold_options:
+
+        for max_payout_option in maximum_payout_options:
+
+            policy_simulation = generate_final_simulation(
+
+                company_performance=company_performance,
+
+                target_variable_pay=target_option,
+
+                selected_budget=selected_budget,
+
+                selected_threshold=threshold_option,
+
+                selected_max_payout=max_payout_option
+            )
+
+            projected_payout = (
+                policy_simulation[
+                    "Final_Variable_Pay"
+                ].sum()
+            )
+
+            budget_gap = (
+                selected_budget - projected_payout
+            )
+
+            budget_utilization = (
+                projected_payout
+                / selected_budget
+                * 100
+            )
+
+            employees_receiving_payout = (
+                policy_simulation[
+                    "Final_Variable_Pay"
+                ] > 0
+            ).sum()
+
+            optimization_results.append({
+
+                "Target Variable Pay (%)":
+                    target_option * 100,
+
+                "Minimum Performance Threshold":
+                    threshold_option,
+
+                "Maximum Payout (%)":
+                    max_payout_option * 100,
+
+                "Projected Variable Pay":
+                    projected_payout,
+
+                "Budget Gap":
+                    budget_gap,
+
+                "Budget Utilization (%)":
+                    budget_utilization,
+
+                "Employees Receiving Payout":
+                    employees_receiving_payout
+            })
+
+
+optimization_df = pd.DataFrame(
+    optimization_results
+)
+
+# ------------------------------------------------------------
+# IDENTIFY BEST POLICY
+# ------------------------------------------------------------
+
+feasible_options = optimization_df[
+    optimization_df["Budget Gap"] >= 0
+].copy()
+
+if not feasible_options.empty:
+
+    recommended_policy = (
+        feasible_options
+        .sort_values(
+            "Budget Gap",
+            ascending=True
+        )
+        .iloc[0]
+    )
+
+    recommendation_status = (
+        "RECOMMENDED POLICY — WITHIN BUDGET"
+    )
+
+else:
+
+    recommended_policy = (
+        optimization_df
+        .sort_values(
+            "Projected Variable Pay",
+            ascending=True
+        )
+        .iloc[0]
+    )
+
+    recommendation_status = (
+        "NO TESTED POLICY FITS THE BUDGET"
+    )
+
+# ------------------------------------------------------------
+# RECOMMENDATION DISPLAY
+# ------------------------------------------------------------
+
+if feasible_options.empty:
+
+    st.warning(
+        "No tested policy combination brings the "
+        "projected variable-pay cost within the approved budget."
+    )
+
+else:
+
+    st.success(
+        recommendation_status
+    )
+
+
+# ------------------------------------------------------------
+# RECOMMENDED POLICY METRICS
+# ------------------------------------------------------------
+
+rec_col1, rec_col2, rec_col3 = st.columns(3)
+
+with rec_col1:
+
+    st.metric(
+        "Recommended Target Variable Pay",
+        f"{recommended_policy['Target Variable Pay (%)']:.1f}%"
+    )
+
+with rec_col2:
+
+    st.metric(
+        "Recommended Threshold",
+        f"{recommended_policy['Minimum Performance Threshold']:.0f}"
+    )
+
+with rec_col3:
+
+    st.metric(
+        "Recommended Maximum Payout",
+        f"{recommended_policy['Maximum Payout (%)']:.0f}%"
+    )
+
+
+rec_col4, rec_col5, rec_col6 = st.columns(3)
+
+with rec_col4:
+
+    st.metric(
+        "Projected Variable Pay",
+        f"₹{recommended_policy['Projected Variable Pay']:,.0f}"
+    )
+
+with rec_col5:
+
+    st.metric(
+        "Budget Utilization",
+        f"{recommended_policy['Budget Utilization (%)']:.1f}%"
+    )
+
+with rec_col6:
+
+    st.metric(
+        "Projected Budget Gap",
+        f"₹{recommended_policy['Budget Gap']:,.0f}"
+    )
+
+
+# ------------------------------------------------------------
+# BASELINE VS RECOMMENDED
+# ------------------------------------------------------------
+
+st.markdown("### Baseline vs Recommended Policy")
+
+comparison_df = pd.DataFrame({
+
+    "Metric": [
+        "Target Variable Pay (%)",
+        "Minimum Performance Threshold",
+        "Maximum Payout (%)",
+        "Projected Variable Pay",
+        "Budget Utilization (%)"
+    ],
+
+    "Current Policy": [
+        target_variable_pay,
+        selected_threshold,
+        selected_max_payout * 100,
+        baseline_payout,
+        baseline_payout / selected_budget * 100
+    ],
+
+    "Recommended Policy": [
+        recommended_policy[
+            "Target Variable Pay (%)"
+        ],
+
+        recommended_policy[
+            "Minimum Performance Threshold"
+        ],
+
+        recommended_policy[
+            "Maximum Payout (%)"
+        ],
+
+        recommended_policy[
+            "Projected Variable Pay"
+        ],
+
+        recommended_policy[
+            "Budget Utilization (%)"
+        ]
+    ]
+})
+
+st.dataframe(
+    comparison_df.style.format({
+        "Current Policy": "{:,.2f}",
+        "Recommended Policy": "{:,.2f}"
+    }),
+    use_container_width=True,
+    hide_index=True
+)
+
+
+# ------------------------------------------------------------
+# POLICY OPTIONS
+# ------------------------------------------------------------
+
+st.markdown("### Tested Policy Alternatives")
+
+display_optimization = optimization_df.sort_values(
+    "Budget Gap",
+    ascending=False
+).copy()
+
+st.dataframe(
+    display_optimization.style.format({
+
+        "Target Variable Pay (%)":
+            "{:.1f}%",
+
+        "Maximum Payout (%)":
+            "{:.0f}%",
+
+        "Projected Variable Pay":
+            "₹{:,.0f}",
+
+        "Budget Gap":
+            "₹{:,.0f}",
+
+        "Budget Utilization (%)":
+            "{:.1f}%"
+    }),
+    use_container_width=True,
+    hide_index=True
+)
