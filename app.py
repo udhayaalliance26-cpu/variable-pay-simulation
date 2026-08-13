@@ -2192,9 +2192,8 @@ story.append(
 # Convert the existing report text into PDF paragraphs
 # Replace ₹ with INR because standard PDF fonts may not
 # support the rupee symbol.
-clean_report_text = report_text.replace("₹", "INR ")
 
-for line in clean_report_text.split("\n"):
+for line in report_text.split("\n"):
 
     if line.strip() == "":
         story.append(Spacer(1, 8))
