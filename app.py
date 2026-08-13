@@ -2336,3 +2336,135 @@ compensation recommendation for a real organization.
         file_name="Variable_Pay_Management_Report.pdf",
         mime="application/pdf"
     )
+    st.download_button(
+    label="📄 Download Management Report (PDF)",
+    data=pdf_buffer,
+    file_name="Variable_Pay_Management_Report.pdf",
+    mime="application/pdf"
+)
+    # ============================================================
+# EXCEL MANAGEMENT REPORT DOWNLOAD
+# ============================================================
+
+excel_buffer = BytesIO()
+
+with pd.ExcelWriter(
+    excel_buffer,
+    engine="openpyxl"
+) as writer:
+
+    # --------------------------------------------------------
+    # SHEET 1 — MANAGEMENT SUMMARY
+    # --------------------------------------------------------
+
+    management_summary = pd.DataFrame({
+        "Metric": [
+            "Workforce Size",
+            "Data Type",
+            "Approved Variable Pay Budget",
+            "Current Projected Variable Pay",
+            "Current Budget Utilization (%)",
+            "Current Budget Gap",
+            "Current Budget Status",
+            "Recommended Target Variable Pay (%)",
+            "Recommended Minimum Performance Threshold",
+            "Recommended Maximum Payout (%)",
+            "Recommended Projected Variable Pay",
+            "Recommended Budget Utilization (%)",
+            "Recommended Budget Status"
+        ],
+
+        "Value": [
+            500,
+            "Synthetic / Academic Simulation",
+            selected_budget,
+            report_baseline_payout,
+            report_budget_utilization,
+            report_budget_gap,
+            report_budget_status,
+            recommended_policy["Target Variable Pay (%)"],
+            recommended_policy["Minimum Performance Threshold"],
+            recommended_policy["Maximum Payout (%)"],
+            recommended_policy["Projected Variable Pay"],
+            recommended_policy["Budget Utilization (%)"],
+            recommended_budget_status
+        ]
+    })
+
+    management_summary.to_excel(
+        writer,
+        sheet_name="Management Summary",
+        index=False
+    )
+
+    # --------------------------------------------------------
+    # SHEET 2 — POLICY ALTERNATIVES
+    # --------------------------------------------------------
+
+    policy_alternatives.to_excel(
+        writer,
+        sheet_name="Policy Alternatives",
+        index=False
+    )
+
+    # --------------------------------------------------------
+    # SHEET 3 — EMPLOYEE SIMULATION
+    # --------------------------------------------------------
+
+    st.session_state.simulation.to_excel(
+        writer,
+        sheet_name="Employee Simulation",
+        index=False
+    )
+
+    # --------------------------------------------------------
+    # BASIC EXCEL FORMATTING
+    # --------------------------------------------------------
+
+    workbook = writer.book
+
+    for worksheet in workbook.worksheets:
+
+        # Bold header row
+        for cell in worksheet[1]:
+            cell.font = openpyxl.styles.Font(
+                bold=True
+            )
+
+        # Adjust column widths
+        for column_cells in worksheet.columns:
+
+            max_length = 0
+            column_letter = column_cells[0].column_letter
+
+            for cell in column_cells:
+
+                if cell.value is not None:
+
+                    max_length = max(
+                        max_length,
+                        len(str(cell.value))
+                    )
+
+            worksheet.column_dimensions[
+                column_letter
+            ].width = min(
+                max_length + 2,
+                40
+            )
+
+        # Freeze header row
+        worksheet.freeze_panes = "A2"
+
+excel_buffer.seek(0)
+
+# ------------------------------------------------------------
+# EXCEL DOWNLOAD BUTTON
+# ------------------------------------------------------------
+
+st.download_button(
+    label="📊 Download Management Report (Excel)",
+    data=excel_buffer,
+    file_name="Variable_Pay_Management_Report.xlsx",
+    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+)
