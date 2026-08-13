@@ -1243,52 +1243,52 @@ if st.session_state.simulation_run:
 # KPI DISPLAY
 # ------------------------------------------------------------
 
-budget_col1, budget_col2, budget_col3 = st.columns(3)
+    budget_col1, budget_col2, budget_col3 = st.columns(3)
 
-with budget_col1:
+    with budget_col1:
 
-    st.metric(
-        "Approved Budget",
-        f"₹{approved_budget:,.0f}"
-    )
+        st.metric(
+            "Approved Budget",
+            f"₹{approved_budget:,.0f}"
+        )
 
-with budget_col2:
+    with budget_col2:
 
-    st.metric(
-        "Simulated Variable Pay",
-        f"₹{actual_variable_pay:,.0f}"
-    )
+        st.metric(
+            "Simulated Variable Pay",
+            f"₹{actual_variable_pay:,.0f}"
+        )
 
-with budget_col3:
+    with budget_col3:
 
-    st.metric(
-        "Budget Utilization",
-        f"{budget_utilization:.1f}%"
-    )
+        st.metric(
+            "Budget Utilization",
+            f"{budget_utilization:.1f}%"
+        )
 
 
-budget_col4, budget_col5, budget_col6 = st.columns(3)
+    budget_col4, budget_col5, budget_col6 = st.columns(3)
 
-with budget_col4:
+    with budget_col4:
 
-    st.metric(
-        "Budget Surplus / Deficit",
-        f"₹{budget_surplus_deficit:,.0f}"
-    )
+        st.metric(
+            "Budget Surplus / Deficit",
+            f"₹{budget_surplus_deficit:,.0f}"
+        )
 
-with budget_col5:
+    with budget_col5:
 
-    st.metric(
-        "Below Threshold",
-        f"{employees_below_threshold}"
-    )
+        st.metric(
+            "Below Threshold",
+            f"{employees_below_threshold}"
+        )
 
-with budget_col6:
+    with budget_col6:
 
-    st.metric(
-        "At Maximum Payout",
-        f"{employees_at_maximum_payout}"
-    )
+        st.metric(
+            "At Maximum Payout",
+            f"{employees_at_maximum_payout}"
+        )
 
 
 # ------------------------------------------------------------
