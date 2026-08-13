@@ -2190,7 +2190,33 @@ story.append(
 )
 
 # Convert report text into PDF paragraphs
-clean_report_text = report_text.replace("₹", "INR ")
+report_text = f"""
+VARIABLE PAY MANAGEMENT REPORT
+
+RECOMMENDED POLICY
+
+Target Variable Pay: {recommended_policy["Target Variable Pay (%)"]:.1f}%
+Minimum Performance Threshold: {recommended_policy["Minimum Performance Threshold"]}
+Maximum Payout: {recommended_policy["Maximum Payout (%)"]:.1f}%
+Projected Variable Pay: INR {recommended_policy["Projected Variable Pay"]:,.0f}
+Budget Utilization: {recommended_policy["Budget Utilization (%)"]:.1f}%
+
+GOVERNANCE STATUS
+
+Overall Budget Status: {overall_budget_status}
+
+BASELINE PAYOUT
+
+Baseline Variable Pay: INR {baseline_payout:,.0f}
+Approved Budget: INR {selected_budget:,.0f}
+
+DATA DISCLAIMER
+
+This model uses synthetic employee data created for academic purposes.
+No real employee compensation or performance data is used.
+"""
+
+clean_report_text = report_text
 
 for line in clean_report_text.split("\n"):
 
