@@ -2007,3 +2007,92 @@ if st.session_state.simulation_run:
             policy testing may therefore be required.
             """
         )
+        # ============================================================
+# ABOUT THIS MODEL
+# ============================================================
+
+st.divider()
+
+st.subheader("About This Model")
+
+st.markdown("""
+### Purpose
+
+This Variable Pay Simulation Model is designed to evaluate how different
+performance-based compensation policies may affect employee payouts and the
+organization's overall variable-pay budget.
+
+The model helps management compare alternative compensation policies,
+evaluate budget utilization, and identify a policy that balances employee
+performance rewards with compensation governance.
+
+### Synthetic Data Disclaimer
+
+This model uses a **synthetic workforce of 500 employees** created for
+academic and analytical purposes.
+
+The employee records, performance scores, compensation values, departmental
+data, and simulated payouts do **not represent real employees or actual
+company payroll data**.
+
+Therefore, the results should be interpreted as a **simulation of possible
+compensation outcomes**, rather than as actual compensation recommendations
+for a real organization.
+
+### Performance Weighting
+
+Employee performance is incorporated into the variable-pay calculation
+through the overall performance score.
+
+Higher performance scores result in higher potential variable-pay outcomes,
+subject to the defined performance thresholds and maximum payout limits.
+
+This creates a performance-linked compensation structure in which variable
+pay increases as employee performance improves.
+
+### Payout Logic
+
+The model calculates variable pay using the employee's eligible compensation,
+performance outcome, and the selected variable-pay policy.
+
+The payout is constrained by the selected maximum payout percentage and
+performance threshold.
+
+This ensures that the model does not provide unlimited variable-pay
+payouts and maintains consistency with the defined compensation policy.
+
+### Governance Rules
+
+The model incorporates governance controls to ensure that simulated payouts
+remain aligned with the approved variable-pay budget.
+
+Key governance checks include:
+
+- Approved variable-pay budget
+- Budget utilization
+- Budget surplus or deficit
+- Performance threshold
+- Maximum payout limit
+- Overall budget status
+
+A policy is considered acceptable when the projected payout remains within
+the approved compensation budget.
+
+### Optimization Logic
+
+The optimization component evaluates alternative combinations of:
+
+- Target variable pay percentage
+- Minimum performance threshold
+- Maximum payout percentage
+
+Each policy alternative is tested against the approved budget.
+
+The model compares projected variable-pay expenditure and budget utilization
+to identify a policy that provides an appropriate balance between
+performance-based rewards and financial control.
+
+The recommended policy is therefore generated from the simulated policy
+scenarios rather than being treated as a fixed or universal compensation
+rule.
+""")
