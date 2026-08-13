@@ -2149,10 +2149,83 @@ DATA DISCLAIMER
 This model uses synthetic employee data created for academic purposes.
 No real employee compensation or performance data is used.
 """
+# ============================================================
+# PDF MANAGEMENT REPORT DOWNLOAD
+# ============================================================
 
-    st.download_button(
-        label="Download Management Report",
-        data=report_text,
-        file_name="Variable_Pay_Management_Report.txt",
-        mime="text/plain"
+from io import BytesIO
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import (
+    SimpleDocTemplate,
+    Paragraph,
+    Spacer
+)
+
+pdf_buffer = BytesIO()
+
+pdf_doc = SimpleDocTemplate(
+    pdf_buffer,
+    pagesize=A4,
+    rightMargin=40,
+    leftMargin=40,
+    topMargin=40,
+    bottomMargin=40
+)
+
+styles = getSampleStyleSheet()
+
+story = []
+
+# Title
+story.append(
+    Paragraph(
+        "VARIABLE PAY MANAGEMENT REPORT",
+        styles["Title"]
     )
+)
+
+story.append(
+    Spacer(1, 15)
+)
+
+# Convert the existing report text into PDF paragraphs
+# Replace ₹ with INR because standard PDF fonts may not
+# support the rupee symbol.
+clean_report_text = report_text.replace("₹", "INR ")
+
+for line in clean_report_text.split("\n"):
+
+    if line.strip() == "":
+        story.append(Spacer(1, 8))
+
+    elif line.isupper():
+        story.append(
+            Paragraph(
+                f"<b>{line}</b>",
+                styles["Heading2"]
+            )
+        )
+
+    else:
+        story.append(
+            Paragraph(
+                line.replace("&", "&amp;"),
+                styles["BodyText"]
+            )
+        )
+
+        story.append(
+            Spacer(1, 4)
+        )
+
+pdf_doc.build(story)
+
+pdf_buffer.seek(0)
+
+st.download_button(
+    label="📄 Download Management Report (PDF)",
+    data=pdf_buffer,
+    file_name="Variable_Pay_Management_Report.pdf",
+    mime="application/pdf"
+)
