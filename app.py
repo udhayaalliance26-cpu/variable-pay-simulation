@@ -2097,7 +2097,7 @@ scenarios rather than being treated as a fixed or universal compensation
 rule.
 """)
 # ============================================================
-# EXPORTABLE MANAGEMENT REPORT
+# EXPORTABLE MANAGEMENT REPORT + PDF DOWNLOAD
 # ============================================================
 
 if st.session_state.simulation_run:
@@ -2106,160 +2106,233 @@ if st.session_state.simulation_run:
 
     st.subheader("Management Report")
 
-    baseline_payout = pd.to_numeric(
+    # --------------------------------------------------------
+    # REPORT CALCULATIONS
+    # --------------------------------------------------------
+
+    report_baseline_payout = pd.to_numeric(
         st.session_state.simulation["Final_Variable_Pay"],
         errors="coerce"
     ).sum()
 
-    overall_budget_status = (
+    report_budget_utilization = (
+        report_baseline_payout / selected_budget * 100
+        if selected_budget > 0
+        else 0
+    )
+
+    report_budget_gap = (
+        selected_budget - report_baseline_payout
+    )
+
+    report_budget_status = (
         "WITHIN BUDGET"
-        if selected_budget >= baseline_payout
+        if report_baseline_payout <= selected_budget
         else "OVER BUDGET"
     )
 
+    recommended_budget_utilization = (
+        recommended_policy["Budget Utilization (%)"]
+    )
+
+    recommended_budget_status = (
+        "WITHIN BUDGET"
+        if recommended_budget_utilization <= 100
+        else "OVER BUDGET"
+    )
+
+    # --------------------------------------------------------
+    # MANAGEMENT REPORT TEXT
+    # --------------------------------------------------------
+
     report_text = f"""
 VARIABLE PAY MANAGEMENT REPORT
-================================
+========================================
 
 MODEL OVERVIEW
+----------------------------------------
 
 Workforce Size: 500 synthetic employees
 Data Type: Synthetic / Academic Simulation
 
+PURPOSE
+----------------------------------------
+
+This model simulates a variable-pay compensation system
+using synthetic employee data. It evaluates employee
+performance, applies the defined payout logic, compares
+projected payouts with the approved budget, and tests
+alternative compensation-policy settings.
+
 BUDGET & PAYOUT SUMMARY
+----------------------------------------
 
-Approved Variable Pay Budget: ₹{selected_budget:,.0f}
-Projected Variable Pay: ₹{baseline_payout:,.0f}
-Budget Utilization: {(baseline_payout / selected_budget * 100):.1f}%
-Projected Budget Gap: ₹{(selected_budget - baseline_payout):,.0f}
-
-RECOMMENDED POLICY
-
-Target Variable Pay: {recommended_policy["Target Variable Pay (%)"]:.1f}%
-Minimum Performance Threshold: {recommended_policy["Minimum Performance Threshold"]}
-Maximum Payout: {recommended_policy["Maximum Payout (%)"]:.1f}%
-Projected Variable Pay: ₹{recommended_policy["Projected Variable Pay"]:,.0f}
-Budget Utilization: {recommended_policy["Budget Utilization (%)"]:.1f}%
-
-GOVERNANCE STATUS
-
-Overall Budget Status: {overall_budget_status}
-
-POLICY INTERPRETATION
-
-The recommended policy was selected by testing alternative combinations
-of target variable pay, minimum performance threshold, and maximum payout
-against the approved variable-pay budget.
-
-The recommendation is based on the simulated workforce and should not
-be interpreted as an actual compensation recommendation for a real
-organization.
-
-DATA DISCLAIMER
-
-This model uses synthetic employee data created for academic purposes.
-No real employee compensation or performance data is used.
-"""
-# ============================================================
-# PDF MANAGEMENT REPORT DOWNLOAD
-# ============================================================
-
-from io import BytesIO
-from reportlab.lib.pagesizes import A4
-from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.platypus import (
-    SimpleDocTemplate,
-    Paragraph,
-    Spacer
-)
-
-pdf_buffer = BytesIO()
-
-pdf_doc = SimpleDocTemplate(
-    pdf_buffer,
-    pagesize=A4,
-    rightMargin=40,
-    leftMargin=40,
-    topMargin=40,
-    bottomMargin=40
-)
-
-styles = getSampleStyleSheet()
-
-story = []
-
-# Title
-story.append(
-    Paragraph(
-        "VARIABLE PAY MANAGEMENT REPORT",
-        styles["Title"]
-    )
-)
-
-story.append(
-    Spacer(1, 15)
-)
-
-# Convert report text into PDF paragraphs
-report_text = f"""
-VARIABLE PAY MANAGEMENT REPORT
+Approved Variable Pay Budget: INR {selected_budget:,.0f}
+Current Projected Variable Pay: INR {report_baseline_payout:,.0f}
+Current Budget Utilization: {report_budget_utilization:.1f}%
+Current Budget Gap: INR {report_budget_gap:,.0f}
+Current Budget Status: {report_budget_status}
 
 RECOMMENDED POLICY
+----------------------------------------
 
 Target Variable Pay: {recommended_policy["Target Variable Pay (%)"]:.1f}%
 Minimum Performance Threshold: {recommended_policy["Minimum Performance Threshold"]}
 Maximum Payout: {recommended_policy["Maximum Payout (%)"]:.1f}%
 Projected Variable Pay: INR {recommended_policy["Projected Variable Pay"]:,.0f}
-Budget Utilization: {recommended_policy["Budget Utilization (%)"]:.1f}%
+Budget Utilization: {recommended_budget_utilization:.1f}%
+Budget Status: {recommended_budget_status}
 
 GOVERNANCE STATUS
+----------------------------------------
 
-Overall Budget Status: {"WITHIN BUDGET" if recommended_policy['Budget Utilization (%)'] <= 100 else "OVER BUDGET"}
-BASELINE PAYOUT
+The recommended policy is evaluated against the approved
+variable-pay budget.
 
-Baseline Variable Pay: INR {baseline_payout:,.0f}
-Approved Budget: INR {selected_budget:,.0f}
+Policy Status: {recommended_budget_status}
+
+POLICY OPTIMIZATION
+----------------------------------------
+
+The recommended policy was selected by testing alternative
+combinations of target variable pay, minimum performance
+threshold, and maximum payout against the approved
+variable-pay budget.
+
+The optimization process is intended to identify a policy
+setting that provides an appropriate variable-pay structure
+while maintaining budget discipline.
+
+POLICY INTERPRETATION
+----------------------------------------
+
+The simulation links employee performance outcomes with
+variable-pay payouts. Higher performance can result in
+higher payouts subject to the defined threshold and
+maximum-payout rules.
+
+The recommended policy represents the best-performing
+policy configuration identified within the tested
+simulation alternatives and budget constraints.
 
 DATA DISCLAIMER
+----------------------------------------
 
-This model uses synthetic employee data created for academic purposes.
-No real employee compensation or performance data is used.
+This model uses synthetic employee data created for
+academic purposes.
+
+No real employee compensation, salary, or performance
+data is used.
+
+The results should not be interpreted as an actual
+compensation recommendation for a real organization.
 """
 
-clean_report_text = report_text
+    # --------------------------------------------------------
+    # DISPLAY MANAGEMENT REPORT
+    # --------------------------------------------------------
 
-for line in clean_report_text.split("\n"):
+    with st.expander("View Management Report", expanded=True):
 
-    if line.strip() == "":
-        story.append(Spacer(1, 8))
+        st.text(report_text)
 
-    elif line.isupper():
-        story.append(
-            Paragraph(
-                f"<b>{line}</b>",
-                styles["Heading2"]
+    # ========================================================
+    # PDF MANAGEMENT REPORT DOWNLOAD
+    # ========================================================
+
+    from io import BytesIO
+    from xml.sax.saxutils import escape
+
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.platypus import (
+        SimpleDocTemplate,
+        Paragraph,
+        Spacer
+    )
+
+    pdf_buffer = BytesIO()
+
+    pdf_doc = SimpleDocTemplate(
+        pdf_buffer,
+        pagesize=A4,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40
+    )
+
+    styles = getSampleStyleSheet()
+
+    story = []
+
+    # --------------------------------------------------------
+    # PDF TITLE
+    # --------------------------------------------------------
+
+    story.append(
+        Paragraph(
+            "VARIABLE PAY MANAGEMENT REPORT",
+            styles["Title"]
+        )
+    )
+
+    story.append(
+        Spacer(1, 15)
+    )
+
+    # --------------------------------------------------------
+    # CONVERT MANAGEMENT REPORT INTO PDF
+    # --------------------------------------------------------
+
+    for line in report_text.split("\n"):
+
+        clean_line = line.strip()
+
+        if clean_line == "":
+            story.append(
+                Spacer(1, 8)
             )
-        )
 
-    else:
-        story.append(
-            Paragraph(
-                line.replace("&", "&amp;"),
-                styles["BodyText"]
+        elif clean_line.isupper():
+            story.append(
+                Paragraph(
+                    f"<b>{escape(clean_line)}</b>",
+                    styles["Heading2"]
+                )
             )
-        )
 
-        story.append(
-            Spacer(1, 4)
-        )
+            story.append(
+                Spacer(1, 5)
+            )
 
-pdf_doc.build(story)
+        else:
+            story.append(
+                Paragraph(
+                    escape(clean_line),
+                    styles["BodyText"]
+                )
+            )
 
-pdf_buffer.seek(0)
+            story.append(
+                Spacer(1, 4)
+            )
 
-st.download_button(
-    label="📄 Download Management Report (PDF)",
-    data=pdf_buffer,
-    file_name="Variable_Pay_Management_Report.pdf",
-    mime="application/pdf"
-)
+    # --------------------------------------------------------
+    # BUILD PDF
+    # --------------------------------------------------------
+
+    pdf_doc.build(story)
+
+    pdf_buffer.seek(0)
+
+    # --------------------------------------------------------
+    # DOWNLOAD BUTTON
+    # --------------------------------------------------------
+
+    st.download_button(
+        label="📄 Download Management Report (PDF)",
+        data=pdf_buffer,
+        file_name="Variable_Pay_Management_Report.pdf",
+        mime="application/pdf"
+    )
