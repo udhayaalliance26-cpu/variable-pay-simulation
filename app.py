@@ -1101,3 +1101,191 @@ Base Salary
         """,
         language="text"
     )
+# ============================================================
+# BUDGET & GOVERNANCE DASHBOARD
+# ============================================================
+
+st.divider()
+
+st.subheader("Budget & Governance Dashboard")
+
+st.markdown(
+    """
+    Assess whether the simulated variable-pay pool remains
+    within the approved budget and compensation governance rules.
+    """
+)
+
+# ------------------------------------------------------------
+# BUDGET METRICS
+# ------------------------------------------------------------
+
+approved_budget = selected_budget
+
+actual_variable_pay = (
+    simulation["Final_Variable_Pay"].sum()
+)
+
+budget_surplus_deficit = (
+    approved_budget - actual_variable_pay
+)
+
+budget_utilization = (
+    actual_variable_pay
+    / approved_budget
+    * 100
+)
+
+employees_below_threshold = (
+    simulation["Simulated_Overall_Score"]
+    < selected_threshold
+).sum()
+
+employees_at_maximum_payout = (
+    simulation["Final_Payout_Multiplier"]
+    >= selected_max_payout
+).sum()
+
+employees_within_policy = (
+    simulation["Final_Governance_Status"]
+    == "Within Policy"
+).sum()
+
+
+# ------------------------------------------------------------
+# GOVERNANCE STATUS
+# ------------------------------------------------------------
+
+if budget_surplus_deficit >= 0:
+
+    overall_budget_status = "WITHIN APPROVED BUDGET"
+
+else:
+
+    overall_budget_status = "BUDGET EXCEEDED"
+
+
+# ------------------------------------------------------------
+# KPI DISPLAY
+# ------------------------------------------------------------
+
+budget_col1, budget_col2, budget_col3 = st.columns(3)
+
+with budget_col1:
+
+    st.metric(
+        "Approved Budget",
+        f"₹{approved_budget:,.0f}"
+    )
+
+with budget_col2:
+
+    st.metric(
+        "Simulated Variable Pay",
+        f"₹{actual_variable_pay:,.0f}"
+    )
+
+with budget_col3:
+
+    st.metric(
+        "Budget Utilization",
+        f"{budget_utilization:.1f}%"
+    )
+
+
+budget_col4, budget_col5, budget_col6 = st.columns(3)
+
+with budget_col4:
+
+    st.metric(
+        "Budget Surplus / Deficit",
+        f"₹{budget_surplus_deficit:,.0f}"
+    )
+
+with budget_col5:
+
+    st.metric(
+        "Below Threshold",
+        f"{employees_below_threshold}"
+    )
+
+with budget_col6:
+
+    st.metric(
+        "At Maximum Payout",
+        f"{employees_at_maximum_payout}"
+    )
+
+
+# ------------------------------------------------------------
+# OVERALL STATUS
+# ------------------------------------------------------------
+
+if overall_budget_status == "WITHIN APPROVED BUDGET":
+
+    st.success(
+        f"✓ {overall_budget_status}"
+    )
+
+else:
+
+    st.error(
+        f"⚠ {overall_budget_status}"
+    )
+
+
+# ------------------------------------------------------------
+# GOVERNANCE DISTRIBUTION
+# ------------------------------------------------------------
+
+st.markdown("### Governance Distribution")
+
+governance_summary = (
+    simulation["Final_Governance_Status"]
+    .value_counts()
+    .reset_index()
+)
+
+governance_summary.columns = [
+    "Governance Status",
+    "Employees"
+]
+
+st.dataframe(
+    governance_summary,
+    use_container_width=True,
+    hide_index=True
+)
+
+
+# ------------------------------------------------------------
+# PAYOUT CONCENTRATION BY DEPARTMENT
+# ------------------------------------------------------------
+
+st.markdown("### Variable Pay Concentration by Department")
+
+department_payout = (
+    simulation
+    .groupby("Department")["Final_Variable_Pay"]
+    .sum()
+    .reset_index()
+    .sort_values(
+        "Final_Variable_Pay",
+        ascending=False
+    )
+)
+
+department_payout["Payout Share (%)"] = (
+    department_payout["Final_Variable_Pay"]
+    / actual_variable_pay
+    * 100
+)
+
+st.dataframe(
+    department_payout.style.format({
+        "Final_Variable_Pay": "₹{:,.0f}",
+        "Payout Share (%)": "{:.1f}%"
+    }),
+    use_container_width=True,
+    hide_index=True
+)
