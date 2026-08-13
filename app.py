@@ -1636,20 +1636,23 @@ with rec_col6:
 # BASELINE PAYOUT
 # ============================================================
 
-baseline_payout = simulation["Final_Variable_Pay"].sum()
+if st.session_state.simulation_run:
+    simulation = st.session_state.simulation
 
-baseline_budget_gap = (
-    selected_budget - baseline_payout
-)
+    baseline_payout = simulation["Final_Variable_Pay"].sum()
 
-baseline_reduction_required = (
-    max(
-        0,
-        (baseline_payout - selected_budget)
-        / baseline_payout
-        * 100
+    baseline_budget_gap = (
+        selected_budget - baseline_payout
     )
-)
+
+    baseline_reduction_required = (
+        max(
+            0,
+            (baseline_payout - selected_budget)
+            / baseline_payout
+            * 100
+        )
+    )
 st.markdown("### Baseline vs Recommended Policy")
 
 comparison_df = pd.DataFrame({
