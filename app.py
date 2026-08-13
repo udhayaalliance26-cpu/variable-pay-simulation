@@ -1174,51 +1174,53 @@ Base Salary
 # BUDGET & GOVERNANCE DASHBOARD
 # ============================================================
 
-st.divider()
+if st.session_state.simulation_run:
+        simulation = st.session_state.simulation
+    st.divider()
 
-st.subheader("Budget & Governance Dashboard")
+    st.subheader("Budget & Governance Dashboard")
 
-st.markdown(
-    """
-    Assess whether the simulated variable-pay pool remains
-    within the approved budget and compensation governance rules.
-    """
+    st.markdown(
+        """
+        Assess whether the simulated variable-pay pool remains
+        within the approved budget and compensation governance rules.
+        """
 )
 
-# ------------------------------------------------------------
-# BUDGET METRICS
-# ------------------------------------------------------------
+    # ------------------------------------------------------------
+    # BUDGET METRICS
+    # ------------------------------------------------------------
 
-approved_budget = selected_budget
+    approved_budget = selected_budget
 
-actual_variable_pay = (
-    simulation["Final_Variable_Pay"].sum()
-)
+    actual_variable_pay = (
+        simulation["Final_Variable_Pay"].sum()
+    )
 
-budget_surplus_deficit = (
-    approved_budget - actual_variable_pay
-)
+    budget_surplus_deficit = (
+        approved_budget - actual_variable_pay
+    )
 
-budget_utilization = (
-    actual_variable_pay
-    / approved_budget
-    * 100
-)
+    budget_utilization = (
+        actual_variable_pay
+        / approved_budget
+        * 100
+    )
 
-employees_below_threshold = (
-    simulation["Simulated_Overall_Score"]
-    < selected_threshold
-).sum()
+    employees_below_threshold = (
+        simulation["Simulated_Overall_Score"]
+        < selected_threshold
+    ).sum()
 
-employees_at_maximum_payout = (
-    simulation["Final_Payout_Multiplier"]
-    >= selected_max_payout
-).sum()
+    employees_at_maximum_payout = (
+        simulation["Final_Payout_Multiplier"]
+        >= selected_max_payout
+    ).sum()
 
-employees_within_policy = (
-    simulation["Final_Governance_Status"]
-    == "Within Policy"
-).sum()
+    employees_within_policy = (
+        simulation["Final_Governance_Status"]
+        == "Within Policy"
+    ).sum()
 
 
 # ------------------------------------------------------------
