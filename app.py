@@ -1307,29 +1307,30 @@ if st.session_state.simulation_run:
             f"⚠ {overall_budget_status}"
         )
    
+    # --------------------------------------------------------
+    # GOVERNANCE DISTRIBUTION
+    # --------------------------------------------------------
 
-# ------------------------------------------------------------
-# GOVERNANCE DISTRIBUTION
-# ------------------------------------------------------------
+    st.markdown("### Governance Distribution")
 
-st.markdown("### Governance Distribution")
+    governance_summary = (
+        simulation["Final_Governance_Status"]
+        .value_counts()
+        .reset_index()
+    )
 
-governance_summary = (
-    simulation["Final_Governance_Status"]
-    .value_counts()
-    .reset_index()
-)
+    governance_summary.columns = [
+        "Governance Status",
+        "Employees"
+    ]
 
-governance_summary.columns = [
-    "Governance Status",
-    "Employees"
-]
+    st.dataframe(
+        governance_summary,
+        use_container_width=True,
+        hide_index=True
+    )
 
-st.dataframe(
-    governance_summary,
-    use_container_width=True,
-    hide_index=True
-)
+
 
 
 # ------------------------------------------------------------
