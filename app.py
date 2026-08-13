@@ -884,3 +884,203 @@ if run_simulation:
     st.bar_chart(
         budget_chart_data
     )
+        # ========================================================
+    # EMPLOYEE EXPLORER
+    # ========================================================
+
+    st.divider()
+
+    st.subheader("Employee Explorer")
+
+    st.markdown(
+        """
+        Select an employee to examine the drivers behind
+        their simulated variable-pay outcome.
+        """
+    )
+
+    employee_list = simulation[
+        "Employee_ID"
+    ].tolist()
+
+    selected_employee_id = st.selectbox(
+        "Select Employee",
+        employee_list
+    )
+
+    selected_employee = simulation[
+        simulation["Employee_ID"]
+        == selected_employee_id
+    ].iloc[0]
+
+
+    # ========================================================
+    # EMPLOYEE PROFILE
+    # ========================================================
+
+    st.markdown("### Employee Profile")
+
+    profile_col1, profile_col2, profile_col3 = st.columns(3)
+
+    with profile_col1:
+
+        st.write(
+            f"**Employee ID:** "
+            f"{selected_employee['Employee_ID']}"
+        )
+
+        st.write(
+            f"**Department:** "
+            f"{selected_employee['Department']}"
+        )
+
+        st.write(
+            f"**Job Level:** "
+            f"{selected_employee['Job_Level']}"
+        )
+
+
+    with profile_col2:
+
+        st.write(
+            f"**Base Salary:** "
+            f"₹{selected_employee['Base_Salary']:,.0f}"
+        )
+
+        st.write(
+            f"**Target Variable Pay:** "
+            f"{selected_employee['Target_Variable_Pay_Pct'] * 100:.1f}%"
+        )
+
+        st.write(
+            f"**Department Factor:** "
+            f"{selected_employee['Department_Factor']:.2f}x"
+        )
+
+
+    with profile_col3:
+
+        st.write(
+            f"**Final Variable Pay:** "
+            f"₹{selected_employee['Final_Variable_Pay']:,.0f}"
+        )
+
+        st.write(
+            f"**Total Compensation:** "
+            f"₹{selected_employee['Final_Total_Compensation']:,.0f}"
+        )
+
+        st.write(
+            f"**Governance Status:** "
+            f"{selected_employee['Final_Governance_Status']}"
+        )
+
+
+    # ========================================================
+    # PERFORMANCE BREAKDOWN
+    # ========================================================
+
+    st.markdown("### Performance Breakdown")
+
+    performance_breakdown = pd.DataFrame({
+
+        "Performance Component": [
+            "Individual Performance",
+            "Goal Achievement",
+            "Competency Score",
+            "Company Performance"
+        ],
+
+        "Score": [
+            selected_employee[
+                "Individual_Performance"
+            ],
+
+            selected_employee[
+                "Goal_Achievement_Normalized"
+            ],
+
+            selected_employee[
+                "Competency_Score"
+            ],
+
+            selected_employee[
+                "Simulated_Company_Performance"
+            ]
+        ],
+
+        "Weight": [
+            "40%",
+            "30%",
+            "15%",
+            "15%"
+        ]
+    })
+
+    st.dataframe(
+        performance_breakdown,
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # ========================================================
+    # PAYOUT CALCULATION
+    # ========================================================
+
+    st.markdown("### Payout Calculation")
+
+    payout_col1, payout_col2, payout_col3 = st.columns(3)
+
+    with payout_col1:
+
+        st.metric(
+            "Overall Performance Score",
+            f"{selected_employee['Simulated_Overall_Score']:.2f}"
+        )
+
+
+    with payout_col2:
+
+        st.metric(
+            "Payout Multiplier",
+            f"{selected_employee['Final_Payout_Multiplier']:.2f}x"
+        )
+
+
+    with payout_col3:
+
+        st.metric(
+            "Final Variable Pay",
+            f"₹{selected_employee['Final_Variable_Pay']:,.0f}"
+        )
+
+
+    # ========================================================
+    # CALCULATION TRACE
+    # ========================================================
+
+    st.markdown("### Calculation Trace")
+
+    st.code(
+        f"""
+Base Salary
+₹{selected_employee['Base_Salary']:,.2f}
+
+× Target Variable Pay
+{selected_employee['Target_Variable_Pay_Pct'] * 100:.2f}%
+
+= Target Variable Pay
+₹{selected_employee['Simulated_Target_Variable_Pay']:,.2f}
+
+× Payout Multiplier
+{selected_employee['Final_Payout_Multiplier']:.2f}x
+
+× Department Factor
+{selected_employee['Department_Factor']:.2f}x
+
+= Final Variable Pay
+₹{selected_employee['Final_Variable_Pay']:,.2f}
+        """,
+        language="text"
+    )
