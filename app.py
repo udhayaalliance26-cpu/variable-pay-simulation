@@ -1174,8 +1174,11 @@ Base Salary
 # BUDGET & GOVERNANCE DASHBOARD
 # ============================================================
 
+
 if st.session_state.simulation_run:
-        simulation = st.session_state.simulation
+
+    simulation = st.session_state.simulation
+
     st.divider()
 
     st.subheader("Budget & Governance Dashboard")
@@ -1185,7 +1188,7 @@ if st.session_state.simulation_run:
         Assess whether the simulated variable-pay pool remains
         within the approved budget and compensation governance rules.
         """
-)
+    )
 
     # ------------------------------------------------------------
     # BUDGET METRICS
