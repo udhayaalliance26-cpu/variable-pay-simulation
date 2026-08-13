@@ -512,7 +512,7 @@ run_simulation = st.button(
 )
 
 
-if st.session_state.simulation_run:
+if run_simulation:
 
     simulation = generate_final_simulation(
         company_performance=company_performance,
