@@ -2096,3 +2096,63 @@ The recommended policy is therefore generated from the simulated policy
 scenarios rather than being treated as a fixed or universal compensation
 rule.
 """)
+# ============================================================
+# EXPORTABLE MANAGEMENT REPORT
+# ============================================================
+
+if st.session_state.simulation_run:
+
+    st.divider()
+
+    st.subheader("Management Report")
+
+    report_text = f"""
+VARIABLE PAY MANAGEMENT REPORT
+================================
+
+MODEL OVERVIEW
+--------------
+Workforce Size: 500 synthetic employees
+Data Type: Synthetic / Academic Simulation
+
+BUDGET & PAYOUT SUMMARY
+-----------------------
+Approved Variable Pay Budget: ₹{selected_budget:,.0f}
+Projected Variable Pay: ₹{baseline_payout:,.0f}
+Budget Utilization: {(baseline_payout / selected_budget * 100):.1f}%
+Projected Budget Gap: ₹{(selected_budget - baseline_payout):,.0f}
+
+RECOMMENDED POLICY
+------------------
+Target Variable Pay: {recommended_policy["Target Variable Pay (%)"]:.1f}%
+Minimum Performance Threshold: {recommended_policy["Minimum Performance Threshold"]}
+Maximum Payout: {recommended_policy["Maximum Payout (%)"]:.1f}%
+Projected Variable Pay: ₹{recommended_policy["Projected Variable Pay"]:,.0f}
+Budget Utilization: {recommended_policy["Budget Utilization (%)"]:.1f}%
+
+GOVERNANCE STATUS
+-----------------
+Overall Budget Status: {overall_budget_status}
+
+POLICY INTERPRETATION
+---------------------
+The recommended policy was selected by testing alternative combinations
+of target variable pay, minimum performance threshold, and maximum payout
+against the approved variable-pay budget.
+
+The recommendation is based on the simulated workforce and should not
+be interpreted as an actual compensation recommendation for a real
+organization.
+
+DATA DISCLAIMER
+---------------
+This model uses synthetic employee data created for academic purposes.
+No real employee compensation or performance data is used.
+"""
+
+    st.download_button(
+        label="Download Management Report",
+        data=report_text,
+        file_name="Variable_Pay_Management_Report.txt",
+        mime="text/plain"
+    )
