@@ -701,3 +701,186 @@ if run_simulation:
         mime="text/csv",
         use_container_width=True
     )
+        # ========================================================
+    # SCENARIO ANALYSIS
+    # ========================================================
+
+    st.divider()
+
+    st.subheader("Scenario Analysis")
+
+    st.markdown(
+        """
+        Compare the impact of alternative compensation and
+        company-performance assumptions on total variable-pay cost.
+        """
+    )
+
+    scenario_definitions = {
+        "Base Case": {
+            "company_performance": 82,
+            "target_variable_pay": 12
+        },
+
+        "Upside Case": {
+            "company_performance": 95,
+            "target_variable_pay": 12
+        },
+
+        "Downside Case": {
+            "company_performance": 70,
+            "target_variable_pay": 12
+        },
+
+        "High Incentive Case": {
+            "company_performance": 82,
+            "target_variable_pay": 15
+        }
+    }
+
+
+    scenario_results = []
+
+    for scenario_name, assumptions in scenario_definitions.items():
+
+        scenario_simulation = generate_final_simulation(
+
+            company_performance=(
+                assumptions["company_performance"]
+            ),
+
+            target_variable_pay=(
+                assumptions["target_variable_pay"] / 100
+            ),
+
+            selected_budget=selected_budget,
+
+            selected_threshold=selected_threshold,
+
+            selected_max_payout=selected_max_payout
+        )
+
+
+        scenario_total_variable_pay = (
+            scenario_simulation[
+                "Final_Variable_Pay"
+            ].sum()
+        )
+
+
+        scenario_average_payout = (
+            scenario_simulation[
+                "Final_Variable_Pay"
+            ].mean()
+        )
+
+
+        scenario_employees_paid = (
+            scenario_simulation[
+                "Final_Variable_Pay"
+            ] > 0
+        ).sum()
+
+
+        scenario_budget_utilization = (
+            scenario_total_variable_pay
+            / selected_budget
+            * 100
+        )
+
+
+        if scenario_total_variable_pay <= selected_budget:
+            scenario_budget_status = "Within Budget"
+        else:
+            scenario_budget_status = "Over Budget"
+
+
+        scenario_results.append({
+
+            "Scenario": scenario_name,
+
+            "Company Performance (%)":
+                assumptions["company_performance"],
+
+            "Target Variable Pay (%)":
+                assumptions["target_variable_pay"],
+
+            "Total Variable Pay":
+                scenario_total_variable_pay,
+
+            "Average Payout":
+                scenario_average_payout,
+
+            "Employees Receiving Payout":
+                scenario_employees_paid,
+
+            "Budget Utilization (%)":
+                scenario_budget_utilization,
+
+            "Budget Status":
+                scenario_budget_status
+        })
+
+
+    scenario_comparison = pd.DataFrame(
+        scenario_results
+    )
+
+
+    # ========================================================
+    # SCENARIO TABLE
+    # ========================================================
+
+    st.dataframe(
+        scenario_comparison.style.format({
+
+            "Total Variable Pay":
+                "₹{:,.0f}",
+
+            "Average Payout":
+                "₹{:,.0f}",
+
+            "Budget Utilization (%)":
+                "{:.1f}%"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # ========================================================
+    # SCENARIO COST CHART
+    # ========================================================
+
+    st.subheader("Variable Pay Cost by Scenario")
+
+    scenario_chart_data = scenario_comparison[
+        [
+            "Scenario",
+            "Total Variable Pay"
+        ]
+    ].set_index("Scenario")
+
+
+    st.bar_chart(
+        scenario_chart_data
+    )
+
+
+    # ========================================================
+    # SCENARIO BUDGET COMPARISON
+    # ========================================================
+
+    st.subheader("Scenario Budget Utilization")
+
+    budget_chart_data = scenario_comparison[
+        [
+            "Scenario",
+            "Budget Utilization (%)"
+        ]
+    ].set_index("Scenario")
+
+
+    st.bar_chart(
+        budget_chart_data
+    )
