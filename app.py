@@ -1330,35 +1330,43 @@ baseline_reduction_required = (
 # DEFINE POLICY OPTIONS
 # ------------------------------------------------------------
 
-target_options = sorted(
-    set(
-        max(
-            0.05,
-            (target_variable_pay - reduction) / 100
-        )
-        for reduction in [0, 1, 2, 3, 4]
-    )
-)
+# Test target variable-pay levels from 5% to the
+# currently selected target percentage.
 
-threshold_options = sorted(
-    set(
-        [
-            selected_threshold,
-            min(80, selected_threshold + 10),
-            min(80, selected_threshold + 20)
-        ]
+target_options = [
+    value / 100
+    for value in range(
+        5,
+        int(target_variable_pay) + 1
     )
-)
+]
 
-maximum_payout_options = sorted(
-    set(
-        [
-            selected_max_payout,
-            max(0.50, selected_max_payout - 0.25),
-            max(0.50, selected_max_payout - 0.50)
-        ]
-    )
-)
+
+# Test progressively stronger performance thresholds.
+
+threshold_options = [
+    50,
+    55,
+    60,
+    65,
+    70,
+    75,
+    80,
+    85
+]
+
+
+# Test different maximum payout caps.
+
+maximum_payout_options = [
+    0.50,
+    0.75,
+    1.00,
+    1.25,
+    1.50
+]
+
+
 
 # ------------------------------------------------------------
 # TEST ALTERNATIVE POLICIES
