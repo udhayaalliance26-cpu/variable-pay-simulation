@@ -1636,7 +1636,7 @@ with rec_col6:
 # BASELINE PAYOUT
 # ============================================================
 
-baseline_payout = st.session_state.simulation["Final_Variable_Pay"].sum()
+baseline_payout = simulation["Final_Variable_Pay"].sum()
 
 baseline_budget_gap = (
     selected_budget - baseline_payout
