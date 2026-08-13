@@ -1377,29 +1377,31 @@ st.markdown(
     remains unchanged; these are alternative policy tests.
     """
 )
+
 # ============================================================
 # BASELINE
 # ============================================================
 
-simulation = st.session_state.simulation
+baseline_simulation = st.session_state.get("simulation")
 
-baseline_payout = (
-    simulation["Final_Variable_Pay"].sum()
-)
+if baseline_simulation is not None:
 
-baseline_budget_gap = (
-    selected_budget - baseline_payout
-)
-
-baseline_reduction_required = (
-    max(
-        0,
-        (baseline_payout - selected_budget)
-        / baseline_payout
-        * 100
+    baseline_payout = (
+        baseline_simulation["Final_Variable_Pay"].sum()
     )
-)
 
+    baseline_budget_gap = (
+        selected_budget - baseline_payout
+    )
+
+    baseline_reduction_required = (
+        max(
+            0,
+            (baseline_payout - selected_budget)
+            / baseline_payout
+            * 100
+        )
+    )
 
 # ------------------------------------------------------------
 # DEFINE POLICY OPTIONS
