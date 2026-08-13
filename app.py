@@ -1629,9 +1629,6 @@ with rec_col6:
     )
 
 
-# ------------------------------------------------------------
-# BASELINE VS RECOMMENDED
-# ------------------------------------------------------------
 # ============================================================
 # BASELINE PAYOUT
 # ============================================================
@@ -1653,57 +1650,61 @@ if st.session_state.simulation_run:
             * 100
         )
     )
-st.markdown("### Baseline vs Recommended Policy")
+# ============================================================
+# BASELINE VS RECOMMENDED
+# ============================================================
 
-comparison_df = pd.DataFrame({
+    st.markdown("### Baseline vs Recommended Policy")
 
-    "Metric": [
-        "Target Variable Pay (%)",
-        "Minimum Performance Threshold",
-        "Maximum Payout (%)",
-        "Projected Variable Pay",
-        "Budget Utilization (%)"
-    ],
+    comparison_df = pd.DataFrame({
 
-    "Current Policy": [
-        target_variable_pay,
-        selected_threshold,
-        selected_max_payout * 100,
-        baseline_payout,
-        baseline_payout / selected_budget * 100
-    ],
-
-    "Recommended Policy": [
-        recommended_policy[
-            "Target Variable Pay (%)"
-        ],
-
-        recommended_policy[
-            "Minimum Performance Threshold"
-        ],
-
-        recommended_policy[
-            "Maximum Payout (%)"
-        ],
-
-        recommended_policy[
-            "Projected Variable Pay"
-        ],
-
-        recommended_policy[
+        "Metric": [
+            "Target Variable Pay (%)",
+            "Minimum Performance Threshold",
+            "Maximum Payout (%)",
+            "Projected Variable Pay",
             "Budget Utilization (%)"
-        ]
-    ]
-})
+        ],
 
-st.dataframe(
-    comparison_df.style.format({
-        "Current Policy": "{:,.2f}",
-        "Recommended Policy": "{:,.2f}"
-    }),
-    use_container_width=True,
-    hide_index=True
-)
+        "Current Policy": [
+            target_variable_pay,
+            selected_threshold,
+            selected_max_payout * 100,
+            baseline_payout,
+            baseline_payout / selected_budget * 100
+        ],
+
+        "Recommended Policy": [
+            recommended_policy[
+                "Target Variable Pay (%)"
+            ],
+
+            recommended_policy[
+                "Minimum Performance Threshold"
+            ],
+
+            recommended_policy[
+                "Maximum Payout (%)"
+            ],
+
+            recommended_policy[
+                "Projected Variable Pay"
+            ],
+
+            recommended_policy[
+                "Budget Utilization (%)"
+            ]
+        ]
+    })
+
+    st.dataframe(
+        comparison_df.style.format({
+            "Current Policy": "{:,.2f}",
+            "Recommended Policy": "{:,.2f}"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
 
 
 # ------------------------------------------------------------
