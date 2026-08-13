@@ -1641,3 +1641,271 @@ st.dataframe(
     use_container_width=True,
     hide_index=True
 )
+# ============================================================
+# EXECUTIVE MANAGEMENT DASHBOARD
+# ============================================================
+
+if st.session_state.simulation_run:
+
+    st.divider()
+
+    st.subheader("Executive Decision Summary")
+
+    st.markdown(
+        """
+        Management-level view of the current variable-pay policy,
+        financial impact, and model-generated policy recommendation.
+        """
+    )
+
+    # --------------------------------------------------------
+    # CURRENT POLICY METRICS
+    # --------------------------------------------------------
+
+    current_policy_cost = (
+        simulation["Final_Variable_Pay"].sum()
+    )
+
+    current_budget = selected_budget
+
+    current_budget_utilization = (
+        current_policy_cost
+        / current_budget
+        * 100
+    )
+
+    current_budget_gap = (
+        current_budget
+        - current_policy_cost
+    )
+
+    # --------------------------------------------------------
+    # RECOMMENDED POLICY METRICS
+    # --------------------------------------------------------
+
+    recommended_policy_cost = (
+        recommended_policy[
+            "Projected Variable Pay"
+        ]
+    )
+
+    recommended_budget_utilization = (
+        recommended_policy[
+            "Budget Utilization (%)"
+        ]
+    )
+
+    projected_savings = (
+        current_policy_cost
+        - recommended_policy_cost
+    )
+
+    # --------------------------------------------------------
+    # TOP-LEVEL KPIs
+    # --------------------------------------------------------
+
+    exec_col1, exec_col2, exec_col3 = st.columns(3)
+
+    with exec_col1:
+
+        st.metric(
+            "Current Policy Cost",
+            f"₹{current_policy_cost:,.0f}"
+        )
+
+    with exec_col2:
+
+        st.metric(
+            "Approved Budget",
+            f"₹{current_budget:,.0f}"
+        )
+
+    with exec_col3:
+
+        st.metric(
+            "Current Budget Utilization",
+            f"{current_budget_utilization:.1f}%"
+        )
+
+
+    exec_col4, exec_col5, exec_col6 = st.columns(3)
+
+    with exec_col4:
+
+        st.metric(
+            "Recommended Policy Cost",
+            f"₹{recommended_policy_cost:,.0f}"
+        )
+
+    with exec_col5:
+
+        st.metric(
+            "Projected Savings",
+            f"₹{projected_savings:,.0f}"
+        )
+
+    with exec_col6:
+
+        st.metric(
+            "Recommended Utilization",
+            f"{recommended_budget_utilization:.1f}%"
+        )
+
+
+    # --------------------------------------------------------
+    # CURRENT POLICY
+    # --------------------------------------------------------
+
+    st.markdown("### Current Policy")
+
+    current_policy_summary = pd.DataFrame({
+
+        "Policy Lever": [
+            "Target Variable Pay",
+            "Minimum Performance Threshold",
+            "Maximum Payout"
+        ],
+
+        "Current Setting": [
+            f"{target_variable_pay:.1f}%",
+            f"{selected_threshold}",
+            f"{selected_max_payout * 100:.0f}%"
+        ]
+    })
+
+    st.dataframe(
+        current_policy_summary,
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # --------------------------------------------------------
+    # RECOMMENDED POLICY
+    # --------------------------------------------------------
+
+    st.markdown("### Model-Recommended Policy")
+
+    recommended_policy_summary = pd.DataFrame({
+
+        "Policy Lever": [
+            "Target Variable Pay",
+            "Minimum Performance Threshold",
+            "Maximum Payout"
+        ],
+
+        "Recommended Setting": [
+
+            f"{recommended_policy['Target Variable Pay (%)']:.1f}%",
+
+            f"{recommended_policy['Minimum Performance Threshold']:.0f}",
+
+            f"{recommended_policy['Maximum Payout (%)']:.0f}%"
+        ]
+    })
+
+    st.dataframe(
+        recommended_policy_summary,
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # --------------------------------------------------------
+    # DECISION STATUS
+    # --------------------------------------------------------
+
+    if recommended_policy_cost <= current_budget:
+
+        st.success(
+            "RECOMMENDATION: The model-generated policy "
+            "configuration fits within the approved budget."
+        )
+
+    else:
+
+        st.warning(
+            "RECOMMENDATION: The tested policy options "
+            "do not currently fit within the approved budget."
+        )
+
+
+    # --------------------------------------------------------
+    # BUDGET IMPACT
+    # --------------------------------------------------------
+
+    st.markdown("### Financial Impact")
+
+    impact_df = pd.DataFrame({
+
+        "Metric": [
+            "Current Policy Cost",
+            "Recommended Policy Cost",
+            "Approved Budget",
+            "Projected Savings",
+            "Current Budget Utilization",
+            "Recommended Budget Utilization"
+        ],
+
+        "Value": [
+
+            current_policy_cost,
+
+            recommended_policy_cost,
+
+            current_budget,
+
+            projected_savings,
+
+            current_budget_utilization,
+
+            recommended_budget_utilization
+        ]
+    })
+
+    st.dataframe(
+        impact_df.style.format({
+            "Value": "₹{:,.0f}"
+        }),
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # --------------------------------------------------------
+    # MANAGEMENT INTERPRETATION
+    # --------------------------------------------------------
+
+    st.markdown("### Management Interpretation")
+
+    if projected_savings > 0:
+
+        st.write(
+            f"""
+            The current policy produces an estimated variable-pay
+            cost of ₹{current_policy_cost:,.0f}, compared with an
+            approved budget of ₹{current_budget:,.0f}.
+
+            The model-tested recommended policy reduces projected
+            variable-pay cost to ₹{recommended_policy_cost:,.0f},
+            creating an estimated budget improvement of
+            ₹{projected_savings:,.0f}.
+
+            The recommended configuration uses a target variable-pay
+            level of {recommended_policy['Target Variable Pay (%)']:.1f}%,
+            a minimum performance threshold of
+            {recommended_policy['Minimum Performance Threshold']:.0f},
+            and a maximum payout of
+            {recommended_policy['Maximum Payout (%)']:.0f}%.
+            """
+        )
+
+    else:
+
+        st.write(
+            """
+            The current policy does not produce a lower projected
+            cost than the model-tested recommendation. Further
+            policy testing may therefore be required.
+            """
+        )
