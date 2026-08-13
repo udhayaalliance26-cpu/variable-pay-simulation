@@ -2105,6 +2105,7 @@ if st.session_state.simulation_run:
     st.divider()
 
     st.subheader("Management Report")
+
     baseline_payout = pd.to_numeric(
         st.session_state.simulation["Final_Variable_Pay"],
         errors="coerce"
@@ -2114,25 +2115,26 @@ if st.session_state.simulation_run:
         "WITHIN BUDGET"
         if selected_budget >= baseline_payout
         else "OVER BUDGET"
-)
-report_text = f"""
+    )
+
+    report_text = f"""
 VARIABLE PAY MANAGEMENT REPORT
 ================================
 
 MODEL OVERVIEW
---------------
+
 Workforce Size: 500 synthetic employees
 Data Type: Synthetic / Academic Simulation
 
 BUDGET & PAYOUT SUMMARY
------------------------
+
 Approved Variable Pay Budget: ₹{selected_budget:,.0f}
 Projected Variable Pay: ₹{baseline_payout:,.0f}
 Budget Utilization: {(baseline_payout / selected_budget * 100):.1f}%
 Projected Budget Gap: ₹{(selected_budget - baseline_payout):,.0f}
 
 RECOMMENDED POLICY
-------------------
+
 Target Variable Pay: {recommended_policy["Target Variable Pay (%)"]:.1f}%
 Minimum Performance Threshold: {recommended_policy["Minimum Performance Threshold"]}
 Maximum Payout: {recommended_policy["Maximum Payout (%)"]:.1f}%
@@ -2140,11 +2142,11 @@ Projected Variable Pay: ₹{recommended_policy["Projected Variable Pay"]:,.0f}
 Budget Utilization: {recommended_policy["Budget Utilization (%)"]:.1f}%
 
 GOVERNANCE STATUS
------------------
+
 Overall Budget Status: {overall_budget_status}
 
 POLICY INTERPRETATION
----------------------
+
 The recommended policy was selected by testing alternative combinations
 of target variable pay, minimum performance threshold, and maximum payout
 against the approved variable-pay budget.
@@ -2154,7 +2156,7 @@ be interpreted as an actual compensation recommendation for a real
 organization.
 
 DATA DISCLAIMER
----------------
+
 This model uses synthetic employee data created for academic purposes.
 No real employee compensation or performance data is used.
 """
