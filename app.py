@@ -515,9 +515,9 @@ with col1:
 
     company_performance = st.slider(
         "Company Performance (%)",
-        min_value=50,
+        min_value=0
         max_value=100,
-        value=82,
+        value=50
         step=1
     )
 
@@ -528,7 +528,7 @@ with col2:
         "Target Variable Pay (%)",
         min_value=5,
         max_value=25,
-        value=12,
+        value=5
         step=1
     )
 
@@ -540,7 +540,7 @@ with col3:
         min_value=1_000_000,
         max_value=100_000_000,
         value=30_000_000,
-        step=1_000_000
+        step=100_000
     )
 
 
@@ -552,8 +552,8 @@ with col4:
         "Minimum Performance Threshold",
         min_value=40,
         max_value=80,
-        value=50,
-        step=5
+        value=40,
+        step=1
     )
 
 
@@ -563,8 +563,8 @@ with col5:
         "Maximum Payout (% of Target)",
         min_value=50,
         max_value=150,
-        value=150,
-        step=10
+        value=10,
+        step=5
     ) / 100
 
 
