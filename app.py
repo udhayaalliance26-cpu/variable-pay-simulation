@@ -2203,8 +2203,7 @@ Budget Utilization: {recommended_policy["Budget Utilization (%)"]:.1f}%
 
 GOVERNANCE STATUS
 
-Overall Budget Status: {"WITHIN BUDGET" if baseline_budget_gap >= 0 else "OVER BUDGET"}
-
+Overall Budget Status: {"WITHIN BUDGET" if recommended_policy['Budget Utilization (%)'] <= 100 else "OVER BUDGET"}
 BASELINE PAYOUT
 
 Baseline Variable Pay: INR {baseline_payout:,.0f}
